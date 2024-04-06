@@ -6,12 +6,11 @@ import Home from './Pages/Home'
 import CoinPage from './Pages/CoinPage'
 import { makeStyles,createTheme,ThemeProvider } from '@material-ui/core/styles';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(()=>({
   App: {
-    backgroundColor: '3fff',
     color: 'white',
   },
-});
+}));
 
 const theme = createTheme({
   palette: {
@@ -29,8 +28,8 @@ function App() {
     <div className={classes.App} >
       <Header/>
       <Routes>
-      <Route path='/' component={<Home/>} exact/>
-      <Route path='/coins/:id' component={<CoinPage/>} />
+      <Route path='/' element={<Home/>} exact/>
+      <Route path='/coins/:id' element={<CoinPage/>} />
       </Routes>
     </div>
     </ThemeProvider>

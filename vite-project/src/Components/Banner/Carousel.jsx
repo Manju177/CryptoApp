@@ -1,9 +1,10 @@
-import { Hidden, makeStyles } from '@material-ui/core'
+import { Hidden, LinearProgress, makeStyles } from '@material-ui/core'
 import React, {useState,useEffect} from 'react'
 import { TrendingCoins } from '../../config/api'
 import { Cryptocon } from '../../CryptoContext'
 import { Link } from 'react-router-dom'
 import AliceCarousel from 'react-alice-carousel';
+// import LinearDeterminate from '../../assets/LinearProgressBar'
 
 const useStyles=makeStyles((theme)=>({
     carousel:{
@@ -21,13 +22,25 @@ const useStyles=makeStyles((theme)=>({
     },
 }))
 
+export const numberWithRounding=(x)=>{
+ return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",")
+   
+}
 function Carousel() {
-    const {currency}=Cryptocon();
+    const {currency,symbol}=Cryptocon();
     const [trending,setTrending]=useState([]);
 
    useEffect(() => {
-    fetchData()
+    //debouncing update
+    
+    const time=setTimeout(()=>{
+      fetchData()
+    },1000)
+    return ()=>{
+      clearTimeout(time)
+    }
    }, [currency])
+
    
     function fetchData(){
     setTimeout(async() => {
@@ -46,12 +59,21 @@ function Carousel() {
     const classes=useStyles()
 
     const items=trending.map((coin)=>{
+      let profit=coin.price_change_percentage_24h>=0
       return (
         <Link
         className={classes.carouselItem}
         to={`/coins/${coin.id}`}
         >
           <img src={coin.image} alt={coin.name} height='80' style={{marginBottom: 10}} />
+          <span>{coin?.symbol}</span>
+          &nbsp;
+          <span>
+            {profit && '+'}{coin.price_change_percentage_24h?.toFixed(2)}
+          </span>
+          <span style={{fontSize:22, fontWeight:500}}>
+            {symbol}{numberWithRounding(coin?.current_price.toFixed(2))}
+          </span>
         </Link>
       )
     })
@@ -65,6 +87,8 @@ function Carousel() {
       }
     }
   return (
+    <>
+    {/* <LinearDeterminate/> */}
     <div className={classes.carousel}>
       <AliceCarousel
       mouseTracking items={items}
@@ -73,8 +97,11 @@ function Carousel() {
       animationDuration={1500}
       responsive={responsive}
       autoPlay
+      disableButtonsControls
+      disableDotsControls
        />
     </div>
+    </>
   )
 }
 
